@@ -1,0 +1,40 @@
+import java.sql.*;
+import java.util.Scanner;
+
+public class Login {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter Username: ");
+        String username = sc.next();
+        System.out.print("Enter Password: ");
+        String password = sc.next();
+
+        try {
+            // Establish connection to the database
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/quiz_management", "root", "password");
+
+            // Query to validate login credentials
+            String query = "SELECT * FROM users WHERE username = ? AND password = ?";
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String role = rs.getString("role");
+                if (role.equals("teacher")) {
+                    System.out.println("Logged in as Teacher");
+                    // Redirect to Teacher Dashboard
+                } else {
+                    System.out.println("Logged in as Student");
+                    // Redirect to Student Dashboard
+                }
+            } else {
+                System.out.println("Invalid login credentials");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
